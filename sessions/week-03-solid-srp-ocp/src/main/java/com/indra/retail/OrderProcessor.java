@@ -6,10 +6,12 @@ public class OrderProcessor {
 
     private final StockValidator stockValidator;
     private final OrderNotifier orderNotifier;
+    private final DiscountCalculator discountCalculator;
 
     public OrderProcessor(StockValidator stockValidator, OrderNotifier orderNotifier) {
         this.stockValidator = stockValidator;
         this.orderNotifier = orderNotifier;
+        discountCalculator = new DiscountCalculator();
     }
 
     public BigDecimal process(Order order, int availableStock) {
@@ -17,7 +19,7 @@ public class OrderProcessor {
             throw new IllegalStateException("Stock insuficiente para el pedido " + order.getId());
         }
 
-        BigDecimal finalPrice = order.getDiscountCalculator().applyDiscount(order);
+        BigDecimal finalPrice = discountCalculator.apply(order.getPrice(), order.getDiscountType());
 
         orderNotifier.notifyCustomer(order.getCustomerEmail(),
                 "Tu pedido " + order.getId() + " fue procesado. Total: " + finalPrice);
